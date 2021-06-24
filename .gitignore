@@ -1,0 +1,11 @@
+.DS_Store
+@eaDir/
+.github/@eaDir/
+.github/.DS_Store
+book_sources/@eaDir/
+book_sources/.DS_Store
+book_sources/currencyrate/@eaDir/
+book_sources/currencyrate/.DS_Store
+book_sources/fundperf/@eaDir/
+book_sources/fundperf/.DS_Store
+
