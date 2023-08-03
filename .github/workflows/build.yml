@@ -20,8 +20,7 @@ jobs:
     - name: Checkout 
       uses: actions/checkout@v3
       
-    - run: cp entrypoint.sh /entrypoint.sh
-    - run: chmod +x /entrypoint.sh
-    - run: /entrypoint.sh
+    - name: Build and Deploy 
+      uses: onejar99/gitbook-build-publish-action@v1.0.2
 
 
