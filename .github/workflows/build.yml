@@ -20,6 +20,6 @@ jobs:
     - name: Checkout 
       uses: actions/checkout@v3
 
-    - run: entrypoint.sh
+    - run: /entrypoint.sh
 
 
