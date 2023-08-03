@@ -19,7 +19,9 @@ jobs:
     steps:
     - name: Checkout 
       uses: actions/checkout@v3
-
+      
+    - run: cp entrypoint.sh /entrypoint.sh
+    - run: chmod +x /entrypoint.sh
     - run: /entrypoint.sh
 
 
