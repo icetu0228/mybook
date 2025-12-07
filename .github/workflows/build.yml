@@ -14,29 +14,30 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v3
 
-    - name: Install Node 14 + npm6 (GitBook compatible)
+    # Use modern Node that works with HonKit
+    - name: Install Node
       uses: actions/setup-node@v3
       with:
-        node-version: "14"
+        node-version: "18"
 
-    - name: Downgrade npm to 6
+    # Install HonKit (GitBook modern alternative)
+    - name: Install HonKit
       run: |
-        npm install -g npm@6
+        npm install -g honkit
 
-    - name: Install GitBook CLI
-      run: |
-        npm install -g gitbook-cli
-
-    - name: Install GitBook plugins
+    # Install plugins (from book.json)
+    - name: Install plugins
       run: |
         cd book_sources
-        gitbook install
+        honkit install
 
-    - name: Build GitBook
+    # Build book
+    - name: Build HonKit Book
       run: |
         cd book_sources
-        gitbook build ./ ../_book
+        honkit build ./ ../_book
 
+    # Deploy
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
