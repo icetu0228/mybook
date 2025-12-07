@@ -19,6 +19,16 @@ jobs:
     steps:
     - name: Checkout 
       uses: actions/checkout@v3
+    
+    - name:  清理執行器磁碟空間 (Docker/快取)
+      run: |
+        echo "清理 Docker 系統 (移除所有未使用的容器、映像、網路和快取)..."
+        # 顯示清理前的空間 (可選)
+        df -h
+        # 執行清理，-a 移除所有未使用的映像，-f 強制執行
+        sudo docker system prune -a -f
+        echo "清理完成後的磁碟使用情況："
+        df -h
       
     - name: Build and Deploy 
       uses: onejar99/gitbook-build-publish-action@v1.0.3
