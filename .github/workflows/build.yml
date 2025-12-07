@@ -14,30 +14,25 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v3
 
-    # Use modern Node that works with HonKit
-    - name: Install Node
+    - name: Install Node 16 (HonKit compatible)
       uses: actions/setup-node@v3
       with:
-        node-version: "18"
+        node-version: "16"
 
-    # Install HonKit (GitBook modern alternative)
-    - name: Install HonKit
+    - name: Install HonKit (pinned stable version)
       run: |
-        npm install -g honkit
+        npm install -g honkit@6.7.4
 
-    # Install plugins (from book.json)
     - name: Install plugins
       run: |
         cd book_sources
         honkit install
 
-    # Build book
-    - name: Build HonKit Book
+    - name: Build book
       run: |
         cd book_sources
         honkit build ./ ../_book
 
-    # Deploy
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
