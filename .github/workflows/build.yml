@@ -19,7 +19,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: "18"
+        node-version: "20"
 
     # 1. 安裝 HonKit (不指定版本號，讓它抓最新的)
     # 這解決了 "No matching version" 和 "graceful-fs" 錯誤
