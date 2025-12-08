@@ -15,23 +15,30 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v3
 
-    # 使用 Node 18 (HonKit 支援新版 Node，比 Node 16 更快更穩)
-    - name: Setup Node.js
+    # 使用 Node 20 (解決 File is not defined 錯誤)
+    - name: Setup Node.js 20
       uses: actions/setup-node@v3
       with:
         node-version: "20"
 
-    # 1. 安裝 HonKit (不指定版本號，讓它抓最新的)
-    # 這解決了 "No matching version" 和 "graceful-fs" 錯誤
+    # 1. 安裝 HonKit
     - name: Install HonKit
       run: |
         npm install -g honkit
 
-    # 2. 安裝插件
-    - name: Install plugins
+    # 2. 安裝依賴/插件 (修正點)
+    # HonKit 移除了 'install' 指令。我們改用標準的 npm install。
+    # 如果您有特定的插件 (如 gitbook-plugin-mermaid)，請在這裡加上：
+    # npm install -g gitbook-plugin-mermaid
+    - name: Install dependencies
       run: |
         cd book_sources
-        honkit install
+        # 嘗試安裝 package.json 中的依賴 (如果有)
+        if [ -f "package.json" ]; then
+          npm install
+        else
+          echo "No package.json found, skipping npm install."
+        fi
 
     # 3. 建構書籍
     - name: Build book
@@ -39,10 +46,11 @@ jobs:
         cd book_sources
         honkit build ./ ../_book
 
-    # 4. 空間清理 (解決 "No space left on device" 錯誤)
+    # 4. 空間清理 (解決 No space left on device)
     - name:  Clean up large files before deploy
       run: |
         echo "Deleting node_modules to save space..."
+        # 刪除可能存在的 node_modules
         sudo rm -rf book_sources/node_modules
         echo "Cleaning npm cache..."
         npm cache clean --force
@@ -54,4 +62,4 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./_book
-        commit_message: "Deploy via HonKit"
+        commit_message: "Deploy via HonKit with Node 20"
