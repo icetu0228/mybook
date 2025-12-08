@@ -9,55 +9,49 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: github-pages # 建議使用 Pages 環境
+    environment: github-pages
 
     steps:
     - name: Checkout repo
       uses: actions/checkout@v3
 
-    # --- GitBook 環境設置 ---
-    # GitBook 官方已停止維護，且與新版 Node 不相容。Node 16 是一個相對穩定的選擇。
-    - name: Install Node 16 (GitBook requires old Node)
+    # 使用 Node 18 (HonKit 支援新版 Node，比 Node 16 更快更穩)
+    - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: "16"
+        node-version: "18"
 
-    - name: Install GitBook CLI
-      # GitBook CLI 會自動下載並安裝 book_sources/ 目錄所需的 GitBook 引擎版本
+    # 1. 安裝 HonKit (不指定版本號，讓它抓最新的)
+    # 這解決了 "No matching version" 和 "graceful-fs" 錯誤
+    - name: Install HonKit
       run: |
-        npm install -g gitbook-cli
+        npm install -g honkit
 
-    - name: Install GitBook plugins
-      run: |
-        # 執行 gitbook install 會在 book_sources/ 內建立 node_modules/ 目錄
-        cd book_sources
-        gitbook install
-
-    - name: Build GitBook
+    # 2. 安裝插件
+    - name: Install plugins
       run: |
         cd book_sources
-        # 建構完成的靜態檔案輸出到專案根目錄的 _book/
-        gitbook build ./ ../_book
+        honkit install
 
-    #  空間不足解決方案：在部署前清理大型檔案 
-    - name:  清理建構暫存檔案 (釋放空間)
-      # 刪除 node_modules 和 npm/yarn 快取，這些在建構完成後不再需要
+    # 3. 建構書籍
+    - name: Build book
       run: |
-        echo "清理建構過程產生的 node_modules/ (佔用空間大)..."
-        # 刪除書籍源碼目錄中的 node_modules (內含插件)
-        sudo rm -rf ./book_sources/node_modules
-        
-        echo "清理 npm 快取..."
-        # 清理 npm 全域快取
+        cd book_sources
+        honkit build ./ ../_book
+
+    # 4. 空間清理 (解決 "No space left on device" 錯誤)
+    - name:  Clean up large files before deploy
+      run: |
+        echo "Deleting node_modules to save space..."
+        sudo rm -rf book_sources/node_modules
+        echo "Cleaning npm cache..."
         npm cache clean --force
-        
-        echo "清理後的磁碟使用情況："
         df -h
-    #  確保部署有足夠空間 
 
+    # 5. 部署
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./_book
-        commit_message: "Deploy GitBook via GitHub Actions"
+        commit_message: "Deploy via HonKit"
